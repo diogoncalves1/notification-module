@@ -1,14 +1,16 @@
 <?php
-
 namespace Modules\User\Repositories;
 
-use Modules\User\Entities\User;
+use App\Repositories\RepositoryInterface;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
-use App\Repositories\RepositoryInterface;
+use Modules\User\Entities\User;
+use Modules\User\Events\PasswordChanged;
 
 class UserRepository implements RepositoryInterface
 {
@@ -22,7 +24,7 @@ class UserRepository implements RepositoryInterface
     public function store(Request $request)
     {
         try {
-            DB::transaction(function () use ($request) {
+            return DB::transaction(function () use ($request) {
                 $input = $request->except(['roles', 'password']);
 
                 $input['password'] = Hash::make($request->get('password'));
@@ -32,6 +34,8 @@ class UserRepository implements RepositoryInterface
 
                 Log::info('User ' . $user->id . ' created');
                 Session::flash('success', 'Utilizador criado com sucesso');
+
+                return $user;
             });
         } catch (\Exception $e) {
             Log::error($e);
@@ -47,8 +51,9 @@ class UserRepository implements RepositoryInterface
 
                 $input = $request->except(['roles', 'password']);
 
-                if ($request->get('password'))
+                if ($request->get('password')) {
                     $input['password'] = Hash::make($request->get('password'));
+                }
 
                 $user->update($input);
                 $this->updateRoles($user, $request->get('roles'));
@@ -99,6 +104,25 @@ class UserRepository implements RepositoryInterface
         }
     }
 
+    public function updatePassword(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            $user = $request->user();
+
+            $input             = [];
+            $input['password'] = Hash::make($request->get('password'));
+
+            $user->update($input);
+
+            event(new PasswordChanged($user));
+        });
+    }
+
+    public function getUserByEmail(string $email)
+    {
+        return User::where("email", $email)->first();
+    }
+
     public function manageRoles(Request $request, string $id)
     {
         try {
@@ -118,61 +142,7 @@ class UserRepository implements RepositoryInterface
         }
     }
 
-    public function dataTable(Request $request)
-    {
-        $query = User::whereDoesntHave('roles', function ($query) {
-            $query->where('code', 'superAdmin');
-        });
-        if ($search = $request->input('search.value')) {
-            $query->where(function ($q) use ($search) {
-                $q->where("name", 'like', "{$search}%")
-                    ->orWhere("email", 'like', "{$search}%")
-                    ->whereHas("roles", function ($query) use ($search) {
-                        $query->where('name', $search);
-                    });
-            });
-        }
-
-        $orderColumnIndex = $request->input('order.0.column');
-        $orderColumn = $request->input("columns.$orderColumnIndex.data");
-        $orderDir = $request->input('order.0.dir');
-        if ($orderColumn && $orderDir) {
-            $query->orderBy($orderColumn, $orderDir);
-        }
-
-        $total = $query->count();
-
-        $users = $query->offset($request->start)
-            ->limit($request->length)
-            ->select("name", "email", "id")
-            ->get();
-
-        foreach ($users as &$user) {
-            $user->roles->pluck('name')->toArray();
-            $user->actions = "<div class='btn-group'>
-                            <a type='button' href='" . route('admin.users.manage', $user->id) . "' class='btn mr-1 btn-default'>
-                                <i class='fas fa-cogs'></i>
-                            </a>
-                            <a type='button' href='" . route('admin.users.edit', $user->id) . "' class='btn mr-1 btn-default'>
-                                <i class='fas fa-edit'></i>
-                            </a>
-                            <button type='button' onclick='modalDelete({$user->id})' class='btn btn-default'>
-                                <i class='fas fa-trash'></i>
-                            </button>
-                        </div>";
-        }
-
-        $data = [
-            'draw' => intval($request->draw),
-            'recordsTotal' => $total,
-            'recordsFiltered' => $total,
-            'data' => $users
-        ];
-
-        return $data;
-    }
-
-    public function updateRoles(User $user, array $roles)
+    public function updateRoles(User $user, ?array $roles = null)
     {
         try {
             DB::transaction(function () use ($user, $roles) {
@@ -181,5 +151,38 @@ class UserRepository implements RepositoryInterface
         } catch (\Exception $e) {
             Log::error($e);
         }
+    }
+
+    public function updateSettings(Request $request): User
+    {
+        return DB::transaction(function () use ($request) {
+            $user = $request->user();
+
+            $userInput        = $request->only(['name', 'email', 'username']);
+            $preferencesInput = $request->only(['currency_id', 'lang']);
+
+            if ($user->username != $request->get('username')) {
+                $userInput['username_updated_at'] = Carbon::now();
+            }
+
+            $user->update($userInput);
+            $user->preferences()->update($preferencesInput);
+
+            App::setLocale($preferencesInput['lang']);
+
+            return $user;
+        });
+    }
+
+    public function checkUsername(Request $request)
+    {
+        return User::where("username", $request->get('username'))->exists();
+    }
+
+    public function checkPassword(Request $request)
+    {
+        $user = $request->user();
+
+        return Hash::check($request->get('current_password'), $user->password);
     }
 }
