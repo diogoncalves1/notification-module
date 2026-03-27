@@ -1,3 +1,6 @@
 {
+    "EmailLayout": true,
+    "Language": true,
+    "Permission": true,
     "User": true
 }
