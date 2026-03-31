@@ -2,6 +2,7 @@
     "ApiResponder": true,
     "EmailLayout": true,
     "Language": true,
+    "Notification": true,
     "Permission": true,
     "User": true
 }

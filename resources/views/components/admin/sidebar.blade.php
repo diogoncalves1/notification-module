@@ -60,11 +60,11 @@
                                 </a>
                             </li> --}}
 
-                            @can('authorization', 'viewNotification')
+                            @can('authorization', 'viewNotifications')
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.shared-roles.index') }}"
-                                        class="nav-link {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'shared-roles') ? 'active' : '' !!}">
-                                        <i class="nav-icon fas fa-user-shield"></i>
+                                    <a href="{{ route('admin.notifications.index') }}"
+                                        class="nav-link {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'notifications') ? 'active' : '' !!}">
+                                        <i class="nav-icon fas fa-bell"></i>
                                         <p>
                                             Notificações
                                         </p>
