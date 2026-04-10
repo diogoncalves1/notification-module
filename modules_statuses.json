@@ -4,5 +4,6 @@
     "Language": true,
     "Notification": true,
     "Permission": true,
-    "User": true
+    "User": true,
+    "UserPreferences": true
 }
