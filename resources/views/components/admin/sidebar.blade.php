@@ -72,6 +72,18 @@
                                 </li>
                             @endcan
 
+                            @can('authorization', 'viewNotificationTypes')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.notificationTypes.index') }}"
+                                        class="nav-link {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'notificationTypes') ? 'active' : '' !!}">
+                                        <i class="nav-icon fas fa-bell"></i>
+                                        <p>
+                                            Tipos de Notificações
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+
                             @can('authorization', 'viewUser')
                                 <li class="nav-header">UTILIZADORES</li>
                                 <li class="nav-item">
@@ -104,11 +116,13 @@
                                 <li class="nav-header">SUPER ADMIN</li>
                                 <li class="nav-item {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'permissions') ||
                                 Illuminate\Support\Str::contains(\Request::route()->getName(), 'languages') ||
+                                Illuminate\Support\Str::contains(\Request::route()->getName(), 'notificationKeywords') ||
                                 Illuminate\Support\Str::contains(\Request::route()->getName(), 'shared-permissions')
                                     ? 'menu-open'
                                     : '' !!} ">
                                     <a href="#" class="nav-link {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'permissions') ||
                                     Illuminate\Support\Str::contains(\Request::route()->getName(), 'languages') ||
+                                    Illuminate\Support\Str::contains(\Request::route()->getName(), 'notificationKeywords') ||
                                     Illuminate\Support\Str::contains(\Request::route()->getName(), 'shared-permissions')
                                         ? 'active'
                                         : '' !!} ">
@@ -128,6 +142,15 @@
                                                 <i class="nav-icon fas fa-user-shield"></i>
                                                 <p>
                                                     Permissões
+                                                </p>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.notificationKeywords.index') }}"
+                                                class="nav-link {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'notificationKeywords') ? 'active' : '' !!}">
+                                                <i class="nav-icon fas fa-bell"></i>
+                                                <p>
+                                                    Keywords de Notificações
                                                 </p>
                                             </a>
                                         </li>
