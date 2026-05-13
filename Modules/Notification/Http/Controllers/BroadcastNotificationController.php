@@ -95,11 +95,17 @@ class BroadcastNotificationController extends ApiController
      */
     public function update(Request $request, $id)
     {
-        $this->allowedAction('editNotifications');
+        try {
+            $this->allowedAction('editNotifications');
 
-        $this->service->update($request->validated(), $id);
+            $this->service->update($request->validated(), $id);
 
-        return redirect()->route('admin.notifications.index');
+            return redirect()->route('admin.notifications.index')->with('success', 'Notificação global atualizada com sucesso.');
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return redirect()->route('admin.notifications.index')->with('error', 'Erro ao atualizar notificação global.');
+        }
     }
 
     /**
@@ -114,11 +120,11 @@ class BroadcastNotificationController extends ApiController
 
             $this->service->destroy($id);
 
-            return $this->ok(message: 'Notificação apagada com sucesso.');
+            return $this->ok(message: 'Tipo de notificação apagado com sucesso.');
         } catch (\Exception $e) {
             Log::error($e);
 
-            return $this->fail('Erro ao apagar notificação.', $e);
+            return $this->fail('Erro ao apagar tipo de notificação.', $e);
         }
     }
 }

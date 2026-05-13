@@ -10,7 +10,7 @@
 @endsection
 
 @section('breadcrumb')
-    <li class="breadcrumb-item active">Notificações</li>
+    <li class="breadcrumb-item active">Tipos de Notificações</li>
 @endsection
 
 @section('content')
@@ -21,8 +21,9 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            @can('authorization', 'createNotifications')
-                                <a href="{{ route('admin.notifications.create') }}" class="btn btn-default">Adicionar
+                            @can('authorization', 'createNotificationTypes')
+                                <a href="{{ route('admin.notificationTypes.create') }}" class="btn btn-default">Adicionar Tipo
+                                    de
                                     Notificação</a>
                             @endcan
                         </div>

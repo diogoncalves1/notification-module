@@ -19,9 +19,9 @@ class NotificationTypeDataTable extends DataTable
     public function dataTable($query)
     {
         $user       = Auth::user();
+        $canView    = $user->can('authorization', 'viewNotificationTypes');
         $canEdit    = $user->can('authorization', 'editNotificationTypes');
         $canDestroy = $user->can('authorization', 'destroyNotificationTypes');
-        $canManage  = $user->can('authorization', 'manageNotificationKeywords');
 
         return datatables()
             ->eloquent($query)
@@ -31,14 +31,14 @@ class NotificationTypeDataTable extends DataTable
             ->addColumn('message', function (NotificationType $notificationType) {
                 return $notificationType->message['pt'] ?? '';
             })
-            ->addColumn('action', function (NotificationType $notificationType) use ($canEdit, $canDestroy, $canManage) {
+            ->addColumn('action', function (NotificationType $notificationType) use ($canView, $canEdit, $canDestroy) {
                 $btn = ' <div class="btn-group">';
-                if ($canManage) {
-                    $btn .= '<a title=\'Gerir Keywords\'
-                data-toggle="tooltip" data-placement="top"
+                if ($canView) {
+                    $btn .= '<a title=\'Vizualizar Email\'
+                data-toggle="tooltip" data-placement="top" target="_blank"
                 class="btn btn-default mr-1"
-                href="' . route("admin.notificationTypes.manage.form", $notificationType->id) . '">
-                    <span class="m-l-5"><i class="fa fa-cogs"></i></span></a>';
+                href="' . route("admin.notificationTypes.show", $notificationType->id) . '">
+                    <span class="m-l-5"><i class="fa fa-eye"></i></span></a>';
                 }
                 if ($canEdit) {
                     $btn .= '<a title=\'Editar\'
@@ -70,7 +70,7 @@ class NotificationTypeDataTable extends DataTable
      */
     public function query(NotificationType $model)
     {
-        return $model->newQuery()->where('is_broadcast', 1);
+        return $model->newQuery()->where('is_broadcast', 0);
     }
 
     /**

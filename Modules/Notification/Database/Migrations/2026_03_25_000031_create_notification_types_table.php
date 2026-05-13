@@ -61,7 +61,6 @@ return new class extends Migration
             ['name' => 'Criar Tipos de Notificações', 'code' => 'createNotificationTypes', 'category' => 'Tipos de Notificações'],
             ['name' => 'Editar Tipos de Notificações', 'code' => 'editNotificationTypes', 'category' => 'Tipos de Notificações'],
             ['name' => 'Apagar Tipos de Notificações', 'code' => 'destroyNotificationTypes', 'category' => 'Tipos de Notificações'],
-            ['name' => 'Gerir Keywords de Tipos de Notificações', 'code' => 'manageNotificationKeywords', 'category' => 'Tipos de Notificações'],
         ];
 
         DB::table('permissions')->insert($permissions);

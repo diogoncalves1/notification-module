@@ -38,9 +38,14 @@ class BroadcastNotificationService
     public function update(array $data, string $id): BroadcastNotification
     {
         return DB::transaction(function () use ($data, $id) {
+            $typeData = array_merge(
+                $data,
+                $this->processMailFields->execute($data)
+            );
+
             $notification = $this->repo->show($id);
 
-            $this->typeRepo->updateByCode($data, $notification->type_code);
+            $this->typeRepo->updateByCode($typeData, $notification->type_code);
 
             return $notification;
         });

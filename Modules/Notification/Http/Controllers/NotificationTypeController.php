@@ -3,10 +3,12 @@ namespace Modules\Notification\Http\Controllers;
 
 use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Modules\Language\Repositories\LanguageRepository;
 use Modules\Notification\DataTables\NotificationTypeDataTable;
 use Modules\Notification\Http\Requests\NotificationTypeRequest;
+use Modules\Notification\Mail\NotificationTypeMail;
 use Modules\Notification\Repositories\NotificationKeywordRepository;
 use Modules\Notification\Repositories\NotificationTypeRepository;
 use Modules\Notification\Services\NotificationTypeService;
@@ -20,6 +22,8 @@ class NotificationTypeController extends ApiController
 
     /**
      * Display a listing of the resource.
+     * @param NotificationTypeDataTable $dataTable
+     * @return \Illuminate\Contracts\View\View
      */
     public function index(NotificationTypeDataTable $dataTable)
     {
@@ -37,8 +41,9 @@ class NotificationTypeController extends ApiController
         $this->allowedAction('createNotificationTypes');
 
         $keywordsList = $this->keywordRepository->all();
+        $languages    = $this->languageRepository->all();
 
-        return view('notification::notification-types.create', compact('keywordsList'));
+        return view('notification::notification-types.create', compact('keywordsList', 'languages'));
     }
 
     /**
@@ -48,20 +53,27 @@ class NotificationTypeController extends ApiController
      */
     public function store(NotificationTypeRequest $request)
     {
-        $this->allowedAction('createNotificationTypes');
+        try {
+            $this->allowedAction('createNotificationTypes');
 
-        $this->service->create($request->validated(), $request->user());
+            $this->service->create($request->validated());
 
-        return redirect()->route('admin.notification-types.index');
+            return redirect()->route('admin.notificationTypes.index')->with('success', 'Tipo de notificação criado com sucesso.');
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return redirect()->route('admin.notificationTypes.index')->with('error', 'Erro ao criar tipo de notificação.');
+        }
     }
 
     /**
-     * Show the specified resource.
+     * Show the mail sent from specified resource.
+     * @param string $id
      */
-    // public function show($id)
-    // {
-    //     return view('notification::show');
-    // }
+    public function show(string $id)
+    {
+        return (new NotificationTypeMail($this->repository->show($id), Auth::user()))->preview();
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -72,10 +84,12 @@ class NotificationTypeController extends ApiController
     {
         $this->allowedAction('editNotificationTypes');
 
-        $notifcationType = $this->repository->show($id);
-        $languages       = $this->languageRepository->all();
+        $type           = $this->repository->show($id);
+        $languages      = $this->languageRepository->all();
+        $keywordsList   = $this->keywordRepository->all();
+        $typeKeywordIds = $type->keywords()->get()->pluck('id')->toArray();
 
-        return view('notification::notification-types.create', compact('notifcationType', 'languages'));
+        return view('notification::notification-types.create', compact('type', 'languages', 'keywordsList', 'typeKeywordIds'));
     }
 
     /**
@@ -86,11 +100,17 @@ class NotificationTypeController extends ApiController
      */
     public function update(NotificationTypeRequest $request, string $id)
     {
-        $this->allowedAction('editNotificationTypes');
+        try {
+            $this->allowedAction('editNotificationTypes');
 
-        $this->repository->update($request->validated(), $id);
+            $this->service->update($request->validated(), $id);
 
-        return redirect()->route('admin.notification-types.index');
+            return redirect()->route('admin.notificationTypes.index')->with('success', 'Tipo de notificação atualizado com sucesso.');
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return redirect()->route('admin.notificationTypes.index')->with('error', 'Erro ao atualizar tipo de notificação.');
+        }
     }
 
     /**

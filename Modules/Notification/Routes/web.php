@@ -16,7 +16,7 @@ Route::group(
 
         Route::resource('notification-keywords', NotificationKeywordController::class, ['except' => 'show'])->names('notificationKeywords');
 
-        Route::resource('notification-types', NotificationTypeController::class, ['except' => 'show'])->names('notificationTypes');
+        Route::resource('notification-types', NotificationTypeController::class)->names('notificationTypes');
 
         Route::group([
             'as'     => 'notificationTypes.manage.',

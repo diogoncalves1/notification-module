@@ -30,13 +30,13 @@
             @endif
             <div class="row">
                 <div class="col-12">
-                    @if (!isset($notification))
-                        <div class="card card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Geral</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Geral</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @if (!isset($notification))
                                     <div class="form-group col-6 {{ $errors->has('code') ? 'has-error' : '' }}">
                                         <label for="inputCode">Código <span class="text-danger">*</span></label>
                                         <input type="text" name="code"
@@ -47,17 +47,19 @@
                                             <span class="error invalid-feedback"><strong>{{ $message }}</strong></span>
                                         @enderror
                                     </div>
-                                    <div class="form-group col-6 {{ $errors->has('pathname') ? 'has-error' : '' }}">
-                                        <label for="inputPathname">Pathname <span class="text-danger">*</span></label>
-                                        <input type="text" name="pathname"
-                                            value='{{ isset($notification) ? $notification->notificationType->pathname : old('pathname') }}'
-                                            class="validate form-control {{ $errors->has('pathname') ? 'is-invalid' : '' }}"
-                                            required>
-                                        @error('pathname')
-                                            <span class="error invalid-feedback"><strong>{{ $message }}</strong></span>
-                                        @enderror
-                                    </div>
-
+                                @endif
+                                <div
+                                    class="form-group {{ isset($notification) ? 'col-12' : 'col-6' }} {{ $errors->has('pathname') ? 'has-error' : '' }}">
+                                    <label for="inputPathname">Pathname <span class="text-danger">*</span></label>
+                                    <input type="text" name="pathname"
+                                        value='{{ isset($notification) ? $notification->notificationType->pathname : old('pathname') }}'
+                                        class="validate form-control {{ $errors->has('pathname') ? 'is-invalid' : '' }}"
+                                        required>
+                                    @error('pathname')
+                                        <span class="error invalid-feedback"><strong>{{ $message }}</strong></span>
+                                    @enderror
+                                </div>
+                                @if (!isset($notification))
                                     <div class="col-2">
                                         <div class="form-group clearfix">
                                             <div class="icheck-primary d-inline ">
@@ -68,11 +70,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                @endif
 
-                                </div>
                             </div>
                         </div>
-                    @endif
+                    </div>
 
                     <div class="card">
                         <div class="card-header p-2">
