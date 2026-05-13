@@ -27,6 +27,15 @@ class NotificationTypeRepository extends FilesRepository implements RepositorySo
         return $type;
     }
 
+    public function updateByCode(array $data, string $code): NotificationType
+    {
+        $type = $this->showByCode($code);
+
+        $type->update($data);
+
+        return $type;
+    }
+
     public function show(string $id): NotificationType
     {
         return NotificationType::findOrFail($id);

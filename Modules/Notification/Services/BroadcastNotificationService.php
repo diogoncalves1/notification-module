@@ -37,7 +37,9 @@ class BroadcastNotificationService
     public function update(array $data, string $id): BroadcastNotification
     {
         return DB::transaction(function () use ($data, $id) {
-            $notification = $this->repo->update($data, $id);
+            $notification = $this->repo->show($id);
+
+            $this->typeRepo->updateByCode($data, $notification->type_code);
 
             return $notification;
         });
