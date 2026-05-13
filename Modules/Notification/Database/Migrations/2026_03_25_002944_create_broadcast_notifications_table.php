@@ -26,10 +26,11 @@ return new class extends Migration
         });
 
         $permissions = [
-            ['name' => 'Ver Notifições', 'code' => 'viewNotifications', 'category' => 'Notifições'],
-            ['name' => 'Criar Notifições', 'code' => 'createNotifications', 'category' => 'Notifições'],
-            ['name' => 'Editar Notifições', 'code' => 'editNotifications', 'category' => 'Notifições'],
-            ['name' => 'Apagar Notifições', 'code' => 'destroyNotifications', 'category' => 'Notifições'],
+            ['name' => 'Ver Notificações', 'code' => 'viewNotifications', 'category' => 'Notificações'],
+            ['name' => 'Ver Email de Notificações', 'code' => 'viewNotificationMail', 'category' => 'Notificações'],
+            ['name' => 'Criar Notificações', 'code' => 'createNotifications', 'category' => 'Notificações'],
+            ['name' => 'Editar Notificações', 'code' => 'editNotifications', 'category' => 'Notificações'],
+            ['name' => 'Apagar Notificações', 'code' => 'destroyNotifications', 'category' => 'Notificações'],
         ];
 
         DB::table('permissions')->insert($permissions);

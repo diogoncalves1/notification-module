@@ -2,7 +2,9 @@
 namespace Modules\Notification\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\Notification\Events\BroadcastNotificationCreated;
 use Modules\Notification\Events\NotificationCreated;
+use Modules\Notification\Listeners\BroadcastNotificationCreatedListener;
 use Modules\Notification\Listeners\NotificationCreatedListener;
 
 class EventServiceProvider extends ServiceProvider
@@ -13,8 +15,11 @@ class EventServiceProvider extends ServiceProvider
      * @var array<string, array<int, string>>
      */
     protected $listen = [
-        NotificationCreated::class => [
+        NotificationCreated::class          => [
             NotificationCreatedListener::class,
+        ],
+        BroadcastNotificationCreated::class => [
+            BroadcastNotificationCreatedListener::class,
         ],
     ];
 
