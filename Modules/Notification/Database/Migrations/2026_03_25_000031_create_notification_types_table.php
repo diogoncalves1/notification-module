@@ -21,6 +21,7 @@ return new class extends Migration
             $table->json('mail_subject')->nullable();
             $table->json('mail_message')->nullable();
             $table->json('mail_signature')->nullable();
+            $table->boolean('is_broadcast')->default(0);
             $table->string('pathname')->nullable();
 
             $table->timestamps();

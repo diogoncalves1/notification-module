@@ -65,12 +65,12 @@ class NotificationTypeDataTable extends DataTable
     /**
      * Get query source of dataTable.
      *
-     * @param County $model
+     * @param NotificationType $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(NotificationType $model)
     {
-        return $model->newQuery();
+        return $model->newQuery()->where('is_broadcast', 1);
     }
 
     /**

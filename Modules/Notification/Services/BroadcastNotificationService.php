@@ -21,6 +21,7 @@ class BroadcastNotificationService
         return DB::transaction(function () use ($data, $user) {
             $typeData = array_merge(
                 $data,
+                ['is_broadcast' => true],
                 $this->processMailFields->execute($data)
             );
 

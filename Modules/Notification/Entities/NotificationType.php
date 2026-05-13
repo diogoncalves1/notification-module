@@ -15,7 +15,7 @@ class NotificationType extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = ['code', 'title', 'message', 'mail_subject', 'mail_message', 'mail_signature', 'pathname'];
+    protected $fillable = ['code', 'title', 'message', 'mail_subject', 'mail_message', 'mail_signature', 'pathname', 'is_broadcast'];
 
     protected $casts = [
         'title'          => 'array',
