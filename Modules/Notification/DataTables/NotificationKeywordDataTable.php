@@ -43,7 +43,7 @@ class NotificationKeywordDataTable extends DataTable
     /**
      * Get query source of dataTable.
      *
-     * @param County $model
+     * @param NotificationKeyword $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function query(NotificationKeyword $model)

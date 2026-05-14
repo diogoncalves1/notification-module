@@ -1,20 +1,25 @@
 <?php
 namespace Modules\Notification\Http\Controllers;
 
-use App\Http\Controllers\AppController;
+use App\Http\Controllers\ApiController;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Modules\Notification\DataTables\NotificationKeywordDataTable;
+use Modules\Notification\Http\Requests\NotificationKeywordRequest;
 use Modules\Notification\Repositories\NotificationKeywordRepository;
 
-class NotificationKeywordController extends AppController
+class NotificationKeywordController extends ApiController
 {
-
     public function __construct(protected NotificationKeywordRepository $repository)
     {
     }
 
     /**
      * Display a listing of the resource.
+     * @param NotificationKeywordDataTable $dataTable
+     * @return View
      */
     public function index(NotificationKeywordDataTable $dataTable)
     {
@@ -25,21 +30,33 @@ class NotificationKeywordController extends AppController
 
     /**
      * Show the form for creating a new resource.
+     * @return View
      */
     public function create()
     {
         $this->allowedAction('superAdmin');
 
-        return view('notification::create');
+        return view('notification::notification-keywords.create');
     }
 
     /**
      * Store a newly created resource in storage.
+     * @param NotificationKeywordRequest
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(NotificationKeywordRequest $request)
     {
-        $this->allowedAction('superAdmin');
+        try {
+            $this->allowedAction('superAdmin');
 
+            $this->repository->store($request);
+
+            return redirect()->route('admin.notificationKeywords.index')->with('success', 'Palavra-chave de notificação criada com sucesso.');
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return redirect()->route('admin.notifications.index')->with('error', 'Erro ao criar palavra-chave de notificação.');
+        }
     }
 
     /**
@@ -52,27 +69,54 @@ class NotificationKeywordController extends AppController
 
     /**
      * Show the form for editing the specified resource.
+     * @param string $id
+     * @return View
      */
-    public function edit($id)
+    public function edit(string $id)
     {
         $this->allowedAction('superAdmin');
 
-        return view('notification::edit');
+        $keyword = $this->repository->show($id);
+
+        return view('notification::notification-keywords.create', compact('keyword'));
     }
 
     /**
      * Update the specified resource in storage.
+     * @param NotificationKeywordRequest
+     * @param string $id
+     * @return RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(NotificationKeywordRequest $request, string $id)
     {
-        $this->allowedAction('superAdmin');
+        try {
+            $this->allowedAction('superAdmin');
+
+            $this->repository->update($request, $id);
+
+            return redirect()->route('admin.notificationKeywords.index')->with('success', 'Palavra-chave de notificação atualizada com sucesso.');
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return redirect()->route('admin.notifications.index')->with('error', 'Erro ao atualizar palavra-chave de notificação.');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
+     * @param string $id
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        $this->allowedAction('superAdmin');
+        try {
+            $this->allowedAction('superAdmin');
+
+            $this->repository->destroy($id);
+
+            return $this->ok(message: 'Palavra-chave de notificação apagada com sucesso');
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail('Erro ao apagar palavra-chave de notificação', $e);
+        }
     }
 }

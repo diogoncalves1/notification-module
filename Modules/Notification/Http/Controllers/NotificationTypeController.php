@@ -94,7 +94,7 @@ class NotificationTypeController extends ApiController
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     * @param NotificationTypeRequest $request
      * @param string $id
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -130,7 +130,6 @@ class NotificationTypeController extends ApiController
             Log::error($e);
             return $this->fail('Erro ao apagar tipo de notificação', $e);
         }
-
     }
 
     /**

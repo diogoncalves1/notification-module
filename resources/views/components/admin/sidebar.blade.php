@@ -76,7 +76,7 @@
                                 <li class="nav-item">
                                     <a href="{{ route('admin.notificationTypes.index') }}"
                                         class="nav-link {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'notificationTypes') ? 'active' : '' !!}">
-                                        <i class="nav-icon fas fa-bell"></i>
+                                        <i class="nav-icon fas fa-layer-group"></i>
                                         <p>
                                             Tipos de Notificações
                                         </p>
@@ -148,7 +148,7 @@
                                         <li class="nav-item">
                                             <a href="{{ route('admin.notificationKeywords.index') }}"
                                                 class="nav-link {!! Illuminate\Support\Str::contains(\Request::route()->getName(), 'notificationKeywords') ? 'active' : '' !!}">
-                                                <i class="nav-icon fas fa-bell"></i>
+                                                <i class="nav-icon fas fa-tags"></i>
                                                 <p>
                                                     Keywords de Notificações
                                                 </p>
