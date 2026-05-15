@@ -18,7 +18,7 @@ class UserResource extends JsonResource
             'name'        => $this->name,
             'email'       => $this->email,
             'roles'       => $this->whenLoaded('roles'),
-            'sharedRole'  => $this->whenHas('sharedRole', new \Modules\SharedRoles\Http\Resources\SharedRoleResource($this->sharedRole)),
+            // 'sharedRole'  => $this->whenHas('sharedRole', new \Modules\SharedRoles\Http\Resources\SharedRoleResource($this->sharedRole)),
             'preferences' => new UserPreferecesResource($this->preferences),
         ];
     }
