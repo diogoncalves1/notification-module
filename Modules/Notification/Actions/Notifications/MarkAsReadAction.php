@@ -3,10 +3,11 @@ namespace Modules\Notification\Actions\Notifications;
 
 use Modules\Notification\Entities\Notification;
 use Modules\Notification\Repositories\NotificationRepository;
+use Modules\Notification\Services\NotificationCacheService;
 
 class MarkAsReadAction
 {
-    public function __construct(protected NotificationRepository $repository)
+    public function __construct(protected NotificationRepository $repository, protected NotificationCacheService $service)
     {
     }
 
@@ -17,6 +18,8 @@ class MarkAsReadAction
         if ($notification->read_at) {
             return $notification;
         }
+
+        $this->service->forgetUnread($notification->user_id);
 
         $notification->update([
             'read_at' => now(),

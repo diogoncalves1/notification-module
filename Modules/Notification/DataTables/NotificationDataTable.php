@@ -41,7 +41,7 @@ class NotificationDataTable extends DataTable
             })
             ->addColumn('createdAt', fn(Notification $notification) => $notification->created_at)
             ->addColumn('readAt', fn(Notification $notification) => $notification->read_at)
-            ->removeColumn(['user_id', 'data', 'type_code', 'created_at', 'deleted_at', 'archived_at', 'read_at', 'updated_at', 'id'])
+            ->removeColumn(['user_id', 'data', 'type_code', 'created_at', 'read_at', 'updated_at', 'id'])
             ->rawColumns(['message', 'title']);
 
     }
@@ -50,7 +50,6 @@ class NotificationDataTable extends DataTable
     {
         return $model->newQuery()
             ->where("user_id", Auth::id())
-            ->whereNull("deleted_at")
             ->whereNull("archived_at")
             ->orderByDesc("created_at")
             ->orderByDesc('id');
