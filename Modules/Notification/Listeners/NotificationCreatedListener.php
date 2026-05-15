@@ -4,6 +4,7 @@ namespace Modules\Notification\Listeners;
 use Illuminate\Support\Facades\Notification;
 use Modules\Notification\Events\NotificationCreated;
 use Modules\Notification\Notifications\NotificationCreatedNotification;
+use Modules\Notification\Services\NotificationCacheService;
 
 class NotificationCreatedListener
 {
@@ -12,7 +13,7 @@ class NotificationCreatedListener
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(protected NotificationCacheService $service)
     {
         //
     }
@@ -26,6 +27,9 @@ class NotificationCreatedListener
     public function handle(NotificationCreated $event)
     {
         $notification = $event->notification;
+
+        $this->service->forgetFeed($notification->user_id);
+        $this->service->forgetUnread($notification->user_id);
 
         $preferences = $notification->user
             ->notificationPreferences()

@@ -37,12 +37,12 @@ class NotificationController extends ApiController
         return $this->safe(function () use ($service) {
             $notifications = $service->get(Auth::id());
 
-            return $this->ok(new NotificationCollection($notifications));
+            return $this->ok(new NotificationCollection($notifications), additionals: ['count' => $service->getUnreadCount(Auth::id())]);
         });
     }
 
     /**
-     * Mark all user notifications as read
+     * Mark notification as archived
      * @param ArchiveNotificationAction $action
      * @param string $id
      */
@@ -69,7 +69,7 @@ class NotificationController extends ApiController
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Mark notification as read
      * @param MarkAsReadAction $action
      * @param string $id
      */

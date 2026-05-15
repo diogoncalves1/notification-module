@@ -6,7 +6,6 @@ use Modules\Notification\Events\BroadcastNotificationCreated;
 use Modules\Notification\Events\NotificationCreated;
 use Modules\Notification\Listeners\BroadcastNotificationCreatedListener;
 use Modules\Notification\Listeners\NotificationCreatedListener;
-use Modules\Notification\Listeners\UpdateNotificationCacheListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -18,7 +17,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         NotificationCreated::class          => [
             NotificationCreatedListener::class,
-            UpdateNotificationCacheListener::class,
         ],
         BroadcastNotificationCreated::class => [
             BroadcastNotificationCreatedListener::class,
