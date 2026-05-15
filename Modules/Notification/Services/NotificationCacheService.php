@@ -13,6 +13,7 @@ class NotificationCacheService
             now()->addMinutes(5),
             function () use ($userId) {
                 return Notification::where('user_id', $userId)
+                    ->whereNull('archived_at')
                     ->latest()
                     ->take(20)
                     ->get();
@@ -20,35 +21,26 @@ class NotificationCacheService
         );
     }
 
-    public function incrementUnread(int $userId): void
+    public function getUnreadCount(int $userId): int
     {
-        Cache::increment("notifications:unread:${userId}");
+        return Cache::remember(
+            "notifications:unread:{$userId}",
+            now()->addMinutes(5),
+            function () use ($userId) {
+                return Notification::where('user_id', $userId)
+                    ->whereNull('read_at')
+                    ->count();
+            }
+        );
     }
 
-    public function decrementUnread(int $userId): void
+    public function forgetFeed(int $userId): void
     {
-        $key = "notifications:unread:{$userId}";
-
-        if ((int) Cache::get($key) > 0) {
-            Cache::decrement($key);
-        }
+        Cache::forget("notifications:feed:{$userId}");
     }
 
-    public function resetUnread(int $userId): void
+    public function forgetUnread(int $userId): void
     {
-        Cache::put("notifications:unread:${userId}", 0);
-    }
-
-    public function push(Notification $notification)
-    {
-        $key = "notifications:feed:{$notification->user_id}";
-
-        $feed = Cache::get($key, []);
-
-        array_unshift($feed, $notification);
-
-        $feed = array_slice($feed, 0, 20);
-
-        Cache::put($key, $feed, now()->addHour());
+        Cache::forget("notifications:unread:{$userId}");
     }
 }
