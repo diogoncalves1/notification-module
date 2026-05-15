@@ -1,49 +1,24 @@
 <?php
 namespace Modules\Notification\Repositories;
 
-use App\Repositories\RepositoryInterface;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Notification\Entities\Notification;
-use Modules\Notification\Events\NotificationCreated;
+use Modules\Notification\Interfaces\NotificationRepositoryInterface;
 
-class NotificationRepository implements RepositoryInterface
+class NotificationRepository implements NotificationRepositoryInterface
 {
-    public function all()
+    public function store(array $data)
     {
-        return Notification::all();
-    }
-
-    public function store(Request $request)
-    {
-        return DB::transaction(function () use ($request) {
-            $user = $request->user();
-
-            $input            = $request->only(['type_code', 'data']);
-            $input['user_id'] = $user->id;
-
-            $preferences = $user->notificationPreferences()->code($input['type_code'])->first();
-
-            $notification = Notification::create($input);
-
-            if ($preferences['email']) {
-                event(new NotificationCreated($notification));
-            }
-        });
-    }
-
-    public function update(Request $request, string $id)
-    {
-        throw new \Exception('Not implemented');
+        return Notification::create($data);
     }
 
     public function show(string $id)
     {
-        throw new \Exception('Not implemented');
+        return Notification::findOrFail($id);
     }
 
-    public function destroy(string $id)
+    public function query(): Builder
     {
-        throw new \Exception('Not implemented');
+        return Notification::query();
     }
 }

@@ -4,6 +4,7 @@ namespace Modules\Notification\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Modules\Notification\Actions\NotificationType\RenderNotificationTemplateAction;
 use Modules\Notification\Entities\BroadcastNotification;
 use Modules\User\Entities\User;
 
@@ -39,29 +40,19 @@ class BroadcastNotificationCreatedMail extends Mailable
 
         $user = $this->user;
 
-        $emailSubject = $notificationType->mail_subject[$user->preferences->lang];
-        $emailText    = $notificationType->mail_message[$user->preferences->lang];
-        $signature    = $notificationType->mail_signature[$user->preferences->lang];
-
-        foreach ($keywords as $keyword) {
-            $emailSubject = str_replace($keyword, $this->notification->data[$keyword], $emailSubject);
-
-            $emailText = str_replace($keyword, $this->notification->data[$keyword], $emailText);
-
-            $signature = str_replace($keyword, $this->notification->data[$keyword], $signature);
-        }
+        $data = app(RenderNotificationTemplateAction::class)->execute($notificationType, $notification->data, $keywords, $user);
 
         $mail = $this->from(config('mail.from.address'), config('app.name'))
-            ->subject($emailSubject);
+            ->subject($data['mailSubject']);
 
         if (! empty($user)) {
             $mail->to($user->email);
         }
 
         $mail->with([
-            'text'      => $emailText,
+            'text'      => $data['mailText'],
             'email'     => config('mail.from.address'),
-            'signature' => $signature,
+            'signature' => $data['mailSignature'],
         ])
             ->markdown('notification::emails.mail');
 

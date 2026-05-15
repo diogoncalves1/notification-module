@@ -10,12 +10,6 @@
     <li class="breadcrumb-item active">{{ isset($keyword) ? 'Editar' : 'Adicionar' }}</li>
 @endsection
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
-
-    <link rel="stylesheet" href="{{ asset('/admin-lte/plugins/summernote/summernote-bs4.min.css') }}">
-@endsection
-
 @section('content')
     <section class="content">
         <form

@@ -16,11 +16,12 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id');
             $table->string('type_code');
-            $table->boolean('is_read')->default(0);
             $table->json('data')->nullable();
             $table->timestamp('read_at')->nullable();
+            $table->timestamp('archived_at')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('type_code')->references('code')->on('notification_types')->onDelete('cascade');

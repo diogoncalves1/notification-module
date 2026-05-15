@@ -26,6 +26,16 @@ class NotificationCreatedListener
     public function handle(NotificationCreated $event)
     {
         $notification = $event->notification;
+
+        $preferences = $notification->user
+            ->notificationPreferences()
+            ->where('type_code', $notification->type_code)
+            ->first();
+
+        if (! $preferences?->email) {
+            return;
+        }
+
         Notification::send($notification, new NotificationCreatedNotification($notification));
     }
 }

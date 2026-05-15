@@ -1,58 +1,97 @@
 <?php
 namespace Modules\Notification\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ApiController;
+use App\Http\Resources\DataTableResource;
+use Illuminate\Support\Facades\Auth;
+use Modules\Notification\Actions\Notifications\ArchiveNotificationAction;
+use Modules\Notification\Actions\Notifications\DeleteNotificationAction;
+use Modules\Notification\Actions\Notifications\MarkAllAsReadAction;
+use Modules\Notification\Actions\Notifications\MarkAsReadAction;
+use Modules\Notification\DataTables\NotificationDataTable;
+use Modules\Notification\Http\Resources\NotificationCollection;
+use Modules\Notification\Http\Resources\NotificationResource;
+use Modules\Notification\Services\NotificationCacheService;
 
-class NotificationController extends Controller
+class NotificationController extends ApiController
 {
     /**
      * Display a listing of the resource.
+     * @param NotificationDataTable $dataTable
      */
-    public function index()
+    public function index(NotificationDataTable $dataTable)
     {
-        return view('notification::index');
+        return $this->safe(function () use ($dataTable) {
+            $data = $dataTable->ajax()->getData(true);
+
+            return new DataTableResource($data);
+        });
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
+     * @param NotificationCacheService $service
      */
-    public function create()
+    public function feed(NotificationCacheService $service)
     {
-        return view('notification::create');
+        return $this->safe(function () use ($service) {
+            $notifications = $service->get(Auth::id());
+
+            return $this->ok(new NotificationCollection($notifications));
+        });
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Mark all user notifications as read
+     * @param ArchiveNotificationAction $action
+     * @param string $id
      */
-    public function store(Request $request)
-    {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function markAsArchived(ArchiveNotificationAction $action, string $id)
     {
-        return view('notification::show');
+        return $this->safe(function () use ($action, $id) {
+            $action->execute($id);
+
+            return $this->ok();
+        });
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Mark all user notifications as read
+     * @param MarkAllAsReadAction $action
      */
-    public function edit($id)
+    public function markAllAsRead(MarkAllAsReadAction $action)
     {
-        return view('notification::edit');
-    }
+        return $this->safe(function () use ($action) {
+            $action->execute(Auth::user());
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {}
+            return $this->ok();
+        });
+    }
 
     /**
      * Remove the specified resource from storage.
+     * @param MarkAsReadAction $action
+     * @param string $id
      */
-    public function destroy($id)
-    {}
+    public function markAsRead(MarkAsReadAction $action, string $id)
+    {
+        return $this->safe(function () use ($action, $id) {
+            $notification = $action->execute($id);
+
+            return $this->ok(new NotificationResource($notification));
+        });
+    }
+    /**
+     * Remove the specified resource from storage.
+     * @param DeleteNotificationAction $action
+     * @param string $id
+     */
+    public function destroy(DeleteNotificationAction $action, string $id)
+    {
+        return $this->safe(function () use ($action, $id) {
+            $action->execute($id);
+
+            return $this->ok();
+        });
+    }
 }

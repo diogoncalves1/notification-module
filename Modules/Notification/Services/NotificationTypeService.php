@@ -39,7 +39,7 @@ class NotificationTypeService
 
             $type = $this->repo->update($typeData, $id);
 
-            $type->keywords()->sync($data['keywords']);
+            $type->keywords()->sync($data['keywords'] ?? []);
 
             return $type;
         });
